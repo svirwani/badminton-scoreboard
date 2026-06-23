@@ -3,65 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Badminton Scoreboard</title>
+    <title>Multi-Sport Scoreboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-container">
-        <!-- HEADER: Set Info & Match Score -->
-        <header class="header">
-            <h1 id="match-status">SET 1</h1>
-            <div class="sets-display">
-                <span class="set-label">Sets Won</span>
-                <div class="set-scores">
-                    <span id="p1-sets" class="set-pill">0</span>
-                    <span class="set-divider">-</span>
-                    <span id="p2-sets" class="set-pill">0</span>
-                </div>
-            </div>
-        </header>
 
-        <!-- MAIN COURT AREA: Scoring Boxes -->
-        <main class="court" id="court-layout">
-            <!-- Player 1 Box (Left by default) -->
-            <div class="player-box" id="p1-box" onclick="scorePoint(1)">
-                <!-- Clickable Serve Button -->
-                <button class="server-badge" id="p1-badge" onclick="selectServer(1, event)">SERVE</button>
-                <input type="text" class="player-name" id="p1-name" value="Player 1" onclick="event.stopPropagation()">
-                <div class="score" id="p1-score">0</div>
-                <div class="service-court" id="p1-court">Court: Right</div>
-            </div>
+    <!-- 1. HOMEPAGE SCREEN -->
+    <div id="screen-home" class="screen">
+        <div class="app-container">
+            <header class="header">
+                <h1 class="logo-title">ScoreHub</h1>
+                <p class="logo-subtitle">Choose a sport to start refereeing</p>
+            </header>
+            
+            <main class="sports-grid">
+                <!-- Badminton Card -->
+                <button class="sport-card active-sport" onclick="navigateTo('screen-config')">
+                    <div class="sport-icon">🏸</div>
+                    <div class="sport-info">
+                        <h3>Badminton</h3>
+                        <p>Fully configured rules & service tracking</p>
+                    </div>
+                </button>
 
-            <!-- Player 2 Box (Right by default) -->
-            <div class="player-box" id="p2-box" onclick="scorePoint(2)">
-                <!-- Clickable Serve Button -->
-                <button class="server-badge" id="p2-badge" onclick="selectServer(2, event)">SERVE</button>
-                <input type="text" class="player-name" id="p2-name" value="Player 2" onclick="event.stopPropagation()">
-                <div class="score" id="p2-score">0</div>
-                <div class="service-court" id="p2-court">Court: Right</div>
-            </div>
-        </main>
+                <!-- Football Card -->
+                <button class="sport-card inactive-sport" onclick="showUnderProgress('Football')">
+                    <div class="sport-icon">⚽</div>
+                    <div class="sport-info">
+                        <h3>Football</h3>
+                        <p>Under Progress</p>
+                    </div>
+                </button>
 
-        <!-- CONTROL PANEL: Actions -->
-        <footer class="controls">
-            <button class="btn btn-secondary" onclick="undo()">
-                Undo
-            </button>
-            <button class="btn btn-secondary" onclick="swapSides()">
-                Swap Sides
-            </button>
-            <button class="btn btn-danger" onclick="resetMatch()">
-                Reset Match
-            </button>
-        </footer>
+                <!-- Volleyball Card -->
+                <button class="sport-card inactive-sport" onclick="showUnderProgress('Volleyball')">
+                    <div class="sport-icon">🏐</div>
+                    <div class="sport-info">
+                        <h3>Volleyball</h3>
+                        <p>Under Progress</p>
+                    </div>
+                </button>
+            </main>
+        </div>
     </div>
 
-    <!-- Notification Modal for Set/Match over -->
+    <!-- 2. BADMINTON SETUP SCREEN -->
+    <div id="screen-config" class="screen hidden">
+        <div class="app-container">
+            <header class="header">
+                <button class="back-link" onclick="navigateTo('screen-home')">← Back to Home</button>
+                <h2 class="section-title">Badminton Setup</h2>
+            </header>
+
+            <main class="setup-form">
+                <!-- Singles / Doubles Selection -->
+                <div class="form-group">
+                    <label class="input-label">Match Type</label>
+                    <div class="toggle-group">
+                        <button id="type-singles" class="toggle-btn active" onclick="setMatchType('singles')">Singles</button>
+                        <button id="type-doubles" class="toggle-btn" onclick="setMatchType('doubles')">Doubles</button>
+                    </div>
+                </div>
+
+                <!-- Name Inputs (Dynamically updated for singles/doubles) -->
+                <div class="form-group" id="names-container">
+                    <label class="input-label">Player Names</label>
+                    <input type="text" id="setup-p1-name" class="setup-input" value="Player 1" placeholder="Enter Player 1 Name">
+                    <input type="text" id="setup-p2-name" class="setup-input" value="Player 2" placeholder="Enter Player 2 Name">
+                </div>
+
+                <!-- Number of Sets -->
+                <div class="form-group">
+                    <label class="input-label">Match Length</label>
+                    <select id="setup-sets" class="setup-select">
+                        <option value="1">Best of 1 (1 set to win)</option>
+                        <option value="2" selected>Best of 3 (2 sets to win)</option>
+                        <option value="3">Best of 5 (3 sets to win)</option>
+                    </select>
+                </div>
+
+                <!-- Select Starting Server -->
+                <div class="form-group">
+                    <label class="input-label">First Serving Player</label>
+                    <select id="setup-server" class="setup-select">
+                        <option value="1" id="server-opt-1">Player 1</option>
+                        <option value="2" id="server-opt-2">Player 2</option>
+                    </select>
+                </div>
+            </main>
+
+            <footer class="setup-footer">
+                <button class="btn btn-primary btn-large" onclick="startMatch()">Start Match 🏸</button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- 3. SCOREBOARD SCREEN (The app created previously) -->
+    <div id="screen-scoreboard" class="screen hidden">
+        <div class="app-container">
+            <!-- HEADER: Set Info, Home Button & Match Score -->
+            <header class="header scoreboard-header">
+                <button class="back-link" onclick="confirmExit()">← Exit</button>
+                <h1 id="match-status">SET 1</h1>
+                <div class="sets-display">
+                    <span class="set-label">Sets Won</span>
+                    <div class="set-scores">
+                        <span id="p1-sets" class="set-pill">0</span>
+                        <span class="set-divider">-</span>
+                        <span id="p2-sets" class="set-pill">0</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- MAIN COURT AREA: Scoring Boxes -->
+            <main class="court" id="court-layout">
+                <!-- Player 1 Box (Left) -->
+                <div class="player-box" id="p1-box" onclick="scorePoint(1)">
+                    <button class="server-badge" id="p1-badge" onclick="selectServer(1, event)">SERVE</button>
+                    <!-- Display Name (Updated dynamically from setup, or click to edit live) -->
+                    <input type="text" class="player-name" id="p1-name" value="Player 1" onclick="event.stopPropagation()">
+                    <div class="score" id="p1-score">0</div>
+                    <div class="service-court" id="p1-court">Court: Right</div>
+                </div>
+
+                <!-- Player 2 Box (Right) -->
+                <div class="player-box" id="p2-box" onclick="scorePoint(2)">
+                    <button class="server-badge" id="p2-badge" onclick="selectServer(2, event)">SERVE</button>
+                    <!-- Display Name (Updated dynamically from setup, or click to edit live) -->
+                    <input type="text" class="player-name" id="p2-name" value="Player 2" onclick="event.stopPropagation()">
+                    <div class="score" id="p2-score">0</div>
+                    <div class="service-court" id="p2-court">Court: Right</div>
+                </div>
+            </main>
+
+            <!-- CONTROL PANEL -->
+            <footer class="controls">
+                <button class="btn btn-secondary" onclick="undo()">
+                    Undo
+                </button>
+                <button class="btn btn-secondary" onclick="swapSides()">
+                    Swap Sides
+                </button>
+                <button class="btn btn-danger" onclick="resetMatch()">
+                    Reset Match
+                </button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Notification Modal (Used for Alerting construction & Set/Match endings) -->
     <div id="modal" class="modal">
         <div class="modal-content">
             <h2 id="modal-title">Set Won!</h2>
             <p id="modal-message">Player 1 wins the set.</p>
-            <button class="btn btn-primary" onclick="closeModal()">Next Set</button>
+            <button id="modal-close-btn" class="btn btn-primary" onclick="closeModal()">OK</button>
         </div>
     </div>
 
