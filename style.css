@@ -25,7 +25,8 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    overflow: hidden;
+    height: 100dvh; /* Uses dynamic viewport height on mobile to ignore browser address bars */
+    overflow: hidden; /* Prevents any scrollbars from appearing */
 }
 
 /* Master Layout */
@@ -36,12 +37,14 @@ body {
     max-width: 600px;
     height: 100%;
     padding: 1rem;
+    justify-content: space-between; /* Distributes top, middle, and bottom sections evenly */
 }
 
 /* Header styling */
 .header {
     text-align: center;
     padding: 0.5rem 0;
+    flex: 0 0 auto; /* Keeps header size stable */
 }
 
 #match-status {
@@ -87,10 +90,10 @@ body {
 /*   DESKTOP / LAPTOP DEFAULT STYLES          */
 /* ========================================== */
 
-/* The Court stretches vertically on computers */
+/* The Court stretches vertically on computers to look great */
 .court {
     display: flex;
-    flex: 1; /* Fills vertical space */
+    flex: 1; 
     gap: 1rem;
     margin: 1rem 0;
     transition: flex-direction 0.3s ease;
@@ -129,27 +132,51 @@ body {
 /* ========================================== */
 @media (max-width: 768px) {
     .app-container {
-        padding: 1.5rem 1rem;
+        padding: 1rem;
     }
 
-    /* Centers court vertically and stops it stretching */
+    /* 1. Limits court height to 38% of screen height to guarantee bottom buttons fit */
     .court {
-        flex: none; 
+        flex: none;
+        height: 38vh; 
         margin: auto 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         width: 100%;
     }
 
-    /* Forces buttons to become squares (half horizontal screen size) */
+    /* 2. Forces boxes to be perfect squares based on the locked court height */
     .player-box {
-        aspect-ratio: 1 / 1;
-        padding: 1rem 0.5rem; /* Slightly tighter padding for mobile */
+        height: 100%; 
+        aspect-ratio: 1 / 1; /* Makes width equal to the height */
+        padding: 0.75rem 0.5rem; /* Tighter padding so contents fit inside square */
+        flex: none;
+        max-width: calc(50vw - 1.5rem); /* Keeps them side-by-side horizontally */
     }
 
-    /* Scales down scores to fit perfectly inside the squares */
+    /* 3. Scales down text inside the square box to prevent vertical stretching */
     .score {
-        font-size: clamp(3.5rem, 14vw, 5.5rem); 
-        margin: 0.25rem 0;
+        font-size: clamp(2.5rem, 10vh, 4.5rem); 
+        margin: 0.1rem 0;
         line-height: 1;
+    }
+
+    .player-name {
+        font-size: 1rem !important;
+    }
+
+    .server-badge {
+        padding: 0.2rem 0.6rem !important;
+        font-size: 0.65rem !important;
+    }
+
+    .service-court {
+        font-size: 0.75rem !important;
+    }
+    
+    .controls {
+        margin-top: 0.5rem;
     }
 }
 
@@ -217,6 +244,7 @@ body {
     display: flex;
     gap: 0.5rem;
     justify-content: space-between;
+    flex: 0 0 auto; /* Keeps bottom controls size stable */
 }
 
 .btn {
