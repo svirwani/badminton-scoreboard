@@ -1,0 +1,252 @@
+/* Color Variables & Reset */
+:root {
+    --bg-dark: #121824;
+    --card-bg: #1e293b;
+    --accent-blue: #3b82f6;
+    --accent-green: #10b981;
+    --accent-gold: #f59e0b;
+    --danger: #ef4444;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    user-select: none; /* Prevents double-tap zooming issues on phones */
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Master Layout */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 600px;
+    height: 100%;
+    padding: 1rem;
+}
+
+/* Header styling */
+.header {
+    text-align: center;
+    padding: 0.5rem 0;
+}
+
+#match-status {
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    color: var(--accent-gold);
+    margin-bottom: 0.25rem;
+}
+
+.sets-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.set-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.set-scores {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.set-pill {
+    background: var(--card-bg);
+    border: 1px solid var(--text-muted);
+    padding: 0.2rem 0.8rem;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.set-divider {
+    color: var(--text-muted);
+}
+
+/* Split Court Layout */
+.court {
+    display: flex;
+    flex: 1;
+    gap: 1rem;
+    margin: 1rem 0;
+    transition: flex-direction 0.3s ease;
+}
+
+/* Scoring Box */
+.player-box {
+    flex: 1;
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    border: 3px solid transparent;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 1rem;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.1s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.player-box:active {
+    transform: scale(0.98);
+}
+
+/* Active Server Box Styling */
+.player-box.serving {
+    border-color: var(--accent-green);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+}
+
+/* Interactive Server Badge (as a button) */
+.server-badge {
+    background-color: transparent;
+    color: var(--text-muted);
+    border: 1.5px solid #475569;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 0.3rem 0.9rem;
+    border-radius: 20px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    z-index: 10; /* Ensures it registers clicks above the box */
+}
+
+/* Hover effects for desktop testing */
+.server-badge:hover {
+    border-color: var(--accent-green);
+    color: var(--text-main);
+}
+
+/* Active Server Badge Styling */
+.player-box.serving .server-badge {
+    background-color: var(--accent-green);
+    color: #0d1520;
+    border-color: var(--accent-green);
+    font-weight: 800;
+}
+
+/* Input names so users can edit them */
+.player-name {
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed var(--text-muted);
+    color: var(--text-main);
+    font-size: 1.25rem;
+    font-weight: bold;
+    text-align: center;
+    width: 80%;
+    outline: none;
+}
+
+.player-name:focus {
+    border-bottom: 2px solid var(--accent-blue);
+}
+
+/* GIANT SCORE TEXT */
+.score {
+    font-size: 6rem;
+    font-weight: 800;
+    font-family: monospace;
+}
+
+.service-court {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* Controls section */
+.controls {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: space-between;
+}
+
+.btn {
+    flex: 1;
+    padding: 0.8rem;
+    font-size: 0.95rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: filter 0.2s ease;
+}
+
+.btn:active {
+    filter: brightness(0.8);
+}
+
+.btn-secondary {
+    background-color: #334155;
+    color: var(--text-main);
+}
+
+.btn-danger {
+    background-color: var(--danger);
+    color: var(--text-main);
+}
+
+.btn-primary {
+    background-color: var(--accent-blue);
+    color: var(--text-main);
+}
+
+/* Overlay modal for Winner notifications */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: 16px;
+    text-align: center;
+    width: 85%;
+    max-width: 400px;
+}
+
+.modal-content h2 {
+    color: var(--accent-gold);
+    margin-bottom: 1rem;
+}
+
+.modal-content p {
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+}
+
+/* Utility Class for Swapping Sides */
+.swapped {
+    flex-direction: row-reverse;
+}
