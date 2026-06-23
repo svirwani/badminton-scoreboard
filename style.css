@@ -10,26 +10,28 @@
     --text-muted: #94a3b8;
 }
 
-* {
-    box-sizing: border-box;
+/* Base resets to block page-level scrolling entirely */
+html, body {
     margin: 0;
     padding: 0;
+    height: 100%;
+    min-height: -webkit-fill-available; /* Fixes iOS Safari address bar height issue */
+    background-color: var(--bg-dark);
+    color: var(--text-main);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    user-select: none; /* Prevents double-tap zooming issues on phones */
+    overflow: hidden; /* Absolutely prevents any scrolling */
 }
 
 body {
-    background-color: var(--bg-dark);
-    color: var(--text-main);
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100vw;
     height: 100vh;
-    height: 100dvh; /* Uses dynamic viewport height on mobile to ignore browser address bars */
-    overflow: hidden; /* Prevents any scrollbars from appearing */
+    height: 100dvh; /* Dynamic height that respects mobile nav bars */
 }
 
-/* Master Layout */
+/* Master Layout Container */
 .app-container {
     display: flex;
     flex-direction: column;
@@ -37,14 +39,15 @@ body {
     max-width: 600px;
     height: 100%;
     padding: 1rem;
-    justify-content: space-between; /* Distributes top, middle, and bottom sections evenly */
+    box-sizing: border-box;
+    justify-content: space-between; /* Evenly distributes Top Header, Middle Court, and Bottom Controls */
 }
 
-/* Header styling */
+/* Header Section */
 .header {
     text-align: center;
     padding: 0.5rem 0;
-    flex: 0 0 auto; /* Keeps header size stable */
+    flex: 0 0 auto; /* Forces header size to remain stable, never shrinking or growing */
 }
 
 #match-status {
@@ -132,13 +135,12 @@ body {
 /* ========================================== */
 @media (max-width: 768px) {
     .app-container {
-        padding: 1rem;
+        padding: 0.75rem; /* Margins scaled down slightly on mobile */
     }
 
-    /* 1. Limits court height to 38% of screen height to guarantee bottom buttons fit */
+    /* Centers court vertically and restricts how much vertical space it can consume */
     .court {
-        flex: none;
-        height: 38vh; 
+        flex: 1 1 auto; /* Dynamically sizes to fit between header and footer */
         margin: auto 0;
         display: flex;
         justify-content: center;
@@ -146,37 +148,33 @@ body {
         width: 100%;
     }
 
-    /* 2. Forces boxes to be perfect squares based on the locked court height */
+    /* FORCES perfect square proportions based on horizontal width */
     .player-box {
-        height: 100%; 
-        aspect-ratio: 1 / 1; /* Makes width equal to the height */
-        padding: 0.75rem 0.5rem; /* Tighter padding so contents fit inside square */
         flex: none;
-        max-width: calc(50vw - 1.5rem); /* Keeps them side-by-side horizontally */
+        width: calc(50vw - 1.25rem); /* Exactly half the horizontal screen width minus margins */
+        max-height: 38vh; /* Keeps buttons from getting too tall on long screens */
+        aspect-ratio: 1 / 1; /* Forces the vertical height to match the calculated width */
+        padding: 0.5rem; /* Reduces padding to fit text comfortably inside */
     }
 
-    /* 3. Scales down text inside the square box to prevent vertical stretching */
+    /* Scales down texts to avoid overflowing the squares */
     .score {
-        font-size: clamp(2.5rem, 10vh, 4.5rem); 
+        font-size: clamp(2.5rem, 8vh, 4rem); 
         margin: 0.1rem 0;
         line-height: 1;
     }
 
     .player-name {
-        font-size: 1rem !important;
+        font-size: 0.95rem !important;
     }
 
     .server-badge {
-        padding: 0.2rem 0.6rem !important;
-        font-size: 0.65rem !important;
+        padding: 0.15rem 0.6rem !important;
+        font-size: 0.6rem !important;
     }
 
     .service-court {
-        font-size: 0.75rem !important;
-    }
-    
-    .controls {
-        margin-top: 0.5rem;
+        font-size: 0.7rem !important;
     }
 }
 
@@ -239,12 +237,13 @@ body {
     color: var(--text-muted);
 }
 
-/* Controls section */
+/* Bottom Controls Section - Guaranteed Visible */
 .controls {
     display: flex;
     gap: 0.5rem;
     justify-content: space-between;
-    flex: 0 0 auto; /* Keeps bottom controls size stable */
+    flex: 0 0 auto; /* Prevents the buttons from shrinking or being squeezed out */
+    padding-bottom: env(safe-area-inset-bottom, 0.5rem); /* Adds padding for iPhone home indicator bar */
 }
 
 .btn {
