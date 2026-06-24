@@ -3,17 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Sport Scoreboard</title>
+    <title>Champ Score - Badminton Scoreboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- 1. HOMEPAGE SCREEN -->
-    <div id="screen-home" class="screen">
-        <div class="app-container">
+    <!-- 1. AUTH / SIGN UP SCREEN -->
+    <div id="screen-auth" class="screen">
+        <div class="app-container center-content">
             <header class="header">
-                <h1 class="logo-title">ScoreHub</h1>
-                <p class="logo-subtitle">Choose a sport to start refereeing</p>
+                <h1 class="logo-title">CHAMP SCORE</h1>
+                <p class="logo-subtitle">Ref your games, track your progress</p>
+            </header>
+
+            <main class="auth-card">
+                <p class="auth-instruction">Create your account to save your match stats</p>
+                
+                <!-- Social Auth Buttons -->
+                <button class="btn-auth btn-google" onclick="handleSocialSignup('Google')">
+                    <span class="auth-icon">⚲</span> Sign up with Google
+                </button>
+                <button class="btn-auth btn-facebook" onclick="handleSocialSignup('Facebook')">
+                    <span class="auth-icon">👤</span> Sign up with Facebook
+                </button>
+
+                <div class="auth-divider"><span>OR</span></div>
+
+                <!-- Email/Phone with OTP Flow -->
+                <div class="otp-flow">
+                    <input type="text" id="auth-identifier" class="setup-input" placeholder="Email or Mobile Number">
+                    <button id="btn-otp" class="btn btn-primary" onclick="sendOTP()">Send Verification Code</button>
+                    
+                    <div id="otp-input-group" class="hidden">
+                        <input type="password" id="otp-code" class="setup-input" placeholder="Enter 4-Digit Code" maxlength="4">
+                        <button class="btn btn-success" onclick="verifyOTP()">Verify & Register</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 2. HOMEPAGE SCREEN -->
+    <div id="screen-home" class="screen hidden">
+        <div class="app-container">
+            <header class="header home-header">
+                <div class="user-greeting">
+                    <p class="greeting-lbl">Welcome Back,</p>
+                    <h2 id="profile-name-disp">Referee</h2>
+                </div>
+                <button class="btn-profile-nav" onclick="viewProfile()">👤 Profile Stats</button>
             </header>
             
             <main class="sports-grid">
@@ -22,7 +60,7 @@
                     <div class="sport-icon">🏸</div>
                     <div class="sport-info">
                         <h3>Badminton</h3>
-                        <p>Fully configured rules & service tracking</p>
+                        <p>Configure matches, tracking sets & service rules</p>
                     </div>
                 </button>
 
@@ -47,11 +85,50 @@
         </div>
     </div>
 
-    <!-- 2. BADMINTON SETUP SCREEN -->
+    <!-- 3. USER PROFILE & HISTORY SCREEN -->
+    <div id="screen-profile" class="screen hidden">
+        <div class="app-container">
+            <header class="header">
+                <button class="back-link" onclick="navigateTo('screen-home')">← Home</button>
+                <h2 class="section-title">Referee Profile</h2>
+            </header>
+
+            <main class="profile-dashboard">
+                <!-- Stats Overview Cards -->
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <span class="stat-num" id="stat-played">0</span>
+                        <span class="stat-lbl">Played</span>
+                    </div>
+                    <div class="stat-card accent-win">
+                        <span class="stat-num text-win" id="stat-won">0</span>
+                        <span class="stat-lbl">Wins</span>
+                    </div>
+                    <div class="stat-card accent-loss">
+                        <span class="stat-num text-loss" id="stat-lost">0</span>
+                        <span class="stat-lbl">Losses</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-num" id="stat-rate">0%</span>
+                        <span class="stat-lbl">Win Rate</span>
+                    </div>
+                </div>
+
+                <!-- Match Log List -->
+                <h3 class="list-heading">Match History</h3>
+                <div class="history-list" id="history-container">
+                    <!-- Dynamic entries added via JS -->
+                    <div class="no-history">No matches refereed yet. Your history will save automatically here.</div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 4. BADMINTON SETUP SCREEN -->
     <div id="screen-config" class="screen hidden">
         <div class="app-container">
             <header class="header">
-                <button class="back-link" onclick="navigateTo('screen-home')">← Back to Home</button>
+                <button class="back-link" onclick="navigateTo('screen-home')">← Back</button>
                 <h2 class="section-title">Badminton Setup</h2>
             </header>
 
@@ -65,7 +142,7 @@
                     </div>
                 </div>
 
-                <!-- Name Inputs (Dynamically updated for singles/doubles) -->
+                <!-- Name Inputs -->
                 <div class="form-group" id="names-container">
                     <label class="input-label">Player Names</label>
                     <input type="text" id="setup-p1-name" class="setup-input" value="Player 1" placeholder="Enter Player 1 Name">
@@ -98,10 +175,10 @@
         </div>
     </div>
 
-    <!-- 3. SCOREBOARD SCREEN (The app created previously) -->
+    <!-- 5. SCOREBOARD SCREEN -->
     <div id="screen-scoreboard" class="screen hidden">
         <div class="app-container">
-            <!-- HEADER: Set Info, Home Button & Match Score -->
+            <!-- HEADER: Set Info, Exit Button & Match Score -->
             <header class="header scoreboard-header">
                 <button class="back-link" onclick="confirmExit()">← Exit</button>
                 <h1 id="match-status">SET 1</h1>
@@ -120,7 +197,6 @@
                 <!-- Player 1 Box (Left) -->
                 <div class="player-box" id="p1-box" onclick="scorePoint(1)">
                     <button class="server-badge" id="p1-badge" onclick="selectServer(1, event)">SERVE</button>
-                    <!-- Display Name (Updated dynamically from setup, or click to edit live) -->
                     <input type="text" class="player-name" id="p1-name" value="Player 1" onclick="event.stopPropagation()">
                     <div class="score" id="p1-score">0</div>
                     <div class="service-court" id="p1-court">Court: Right</div>
@@ -129,34 +205,33 @@
                 <!-- Player 2 Box (Right) -->
                 <div class="player-box" id="p2-box" onclick="scorePoint(2)">
                     <button class="server-badge" id="p2-badge" onclick="selectServer(2, event)">SERVE</button>
-                    <!-- Display Name (Updated dynamically from setup, or click to edit live) -->
                     <input type="text" class="player-name" id="p2-name" value="Player 2" onclick="event.stopPropagation()">
                     <div class="score" id="p2-score">0</div>
                     <div class="service-court" id="p2-court">Court: Right</div>
                 </div>
             </main>
 
-            <!-- CONTROL PANEL -->
-            <footer class="controls">
-                <button class="btn btn-secondary" onclick="undo()">
-                    Undo
-                </button>
-                <button class="btn btn-secondary" onclick="swapSides()">
-                    Swap Sides
-                </button>
-                <button class="btn btn-danger" onclick="resetMatch()">
-                    Reset Match
-                </button>
+            <!-- CONTROL PANEL (Toggled programmatically post-game) -->
+            <footer class="controls" id="scoreboard-controls">
+                <!-- Default Controls -->
+                <button id="ctrl-undo" class="btn btn-secondary" onclick="undo()">Undo</button>
+                <button id="ctrl-swap" class="btn btn-secondary" onclick="swapSides()">Swap Sides</button>
+                <button id="ctrl-reset" class="btn btn-danger" onclick="resetMatch()">Reset Match</button>
+                <!-- Post-Match Only Buttons -->
+                <button id="ctrl-new-match" class="btn btn-primary hidden" onclick="navigateTo('screen-config')">Start New Match</button>
             </footer>
         </div>
     </div>
 
     <!-- Notification Modal (Used for Alerting construction & Set/Match endings) -->
-    <div id="modal" class="modal">
-        <div class="modal-content">
+    <div id="modal" class="modal" onclick="dismissModalOutside(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
             <h2 id="modal-title">Set Won!</h2>
             <p id="modal-message">Player 1 wins the set.</p>
-            <button id="modal-close-btn" class="btn btn-primary" onclick="closeModal()">OK</button>
+            
+            <div id="modal-actions" class="modal-button-layout">
+                <!-- Dynamic actions added via code -->
+            </div>
         </div>
     </div>
 

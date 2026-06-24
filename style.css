@@ -11,7 +11,7 @@
     --text-muted: #94a3b8;
 }
 
-/* Base resets to block page-level scrolling completely */
+/* Base resets to block page-level scrolling entirely */
 html, body {
     margin: 0;
     padding: 0;
@@ -39,7 +39,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    animation: fadeIn 0.2s ease-in-out;
+    animation: fadeIn 0.15s ease-in-out;
 }
 
 .hidden {
@@ -63,12 +63,19 @@ body {
     justify-content: space-between;
 }
 
+.center-content {
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+}
+
 /* Header Section */
 .header {
     text-align: center;
     padding: 0.5rem 0;
     flex: 0 0 auto;
     position: relative;
+    width: 100%;
 }
 
 .logo-title {
@@ -103,15 +110,148 @@ body {
 }
 
 /* ========================================== */
-/*   1. HOMEPAGE GRID & CARDS STYLING          */
+/*   1. AUTHENTICATION & LOGIN PAGE STYLING   */
 /* ========================================== */
+.auth-card {
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    padding: 1.75rem;
+    border: 1px solid #334155;
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.auth-instruction {
+    color: var(--text-muted);
+    text-align: center;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.btn-auth {
+    width: 100%;
+    padding: 0.85rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: transform 0.1s ease;
+}
+
+.btn-auth:active {
+    transform: scale(0.99);
+}
+
+.btn-google {
+    background-color: #ffffff;
+    color: #1e293b;
+}
+
+.btn-facebook {
+    background-color: #1877f2;
+    color: #ffffff;
+}
+
+.auth-icon {
+    font-size: 1.15rem;
+}
+
+.auth-divider {
+    text-align: center;
+    position: relative;
+    margin: 0.5rem 0;
+}
+
+.auth-divider::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background-color: #334155;
+    left: 0;
+    top: 50%;
+}
+
+.auth-divider span {
+    background-color: var(--card-bg);
+    padding: 0 0.75rem;
+    position: relative;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.otp-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+#otp-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    animation: fadeIn 0.2s ease;
+}
+
+.btn-success {
+    background-color: var(--accent-green);
+    color: #000;
+}
+
+/* ========================================== */
+/*   2. HOMEPAGE & PROFILE NAV STYLING        */
+/* ========================================== */
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+}
+
+.user-greeting {
+    text-align: left;
+}
+
+.greeting-lbl {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+#profile-name-disp {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--accent-blue);
+}
+
+.btn-profile-nav {
+    background-color: #334155;
+    color: var(--text-main);
+    border: none;
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Home Sport Grid cards */
 .sports-grid {
     display: flex;
     flex-direction: column;
     gap: 1rem;
     flex: 1;
     justify-content: center;
-    margin: 2rem 0;
 }
 
 .sport-card {
@@ -161,7 +301,149 @@ body {
 }
 
 /* ========================================== */
-/*   2. CONFIGURATION SETUP SCREEN STYLING    */
+/*   3. PROFILE & match history Dashboard      */
+/* ========================================== */
+.profile-dashboard {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    overflow: hidden; /* Lock the dashboard to the screen */
+}
+
+.stats-overview {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+}
+
+.stat-card {
+    background-color: var(--card-bg);
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 0.75rem 0.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.stat-num {
+    font-size: 1.3rem;
+    font-weight: 800;
+}
+
+.stat-lbl {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-top: 0.2rem;
+}
+
+.accent-win { border-color: rgba(16, 185, 129, 0.4); }
+.accent-loss { border-color: rgba(239, 68, 68, 0.4); }
+.text-win { color: var(--accent-green); }
+.text-loss { color: var(--danger); }
+
+.list-heading {
+    font-size: 1rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.history-list {
+    flex: 1;
+    overflow-y: auto; /* Scroll historical entries elegantly */
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-right: 0.25rem;
+}
+
+/* Custom Scrollbar for Match History */
+.history-list::-webkit-scrollbar {
+    width: 6px;
+}
+.history-list::-webkit-scrollbar-thumb {
+    background-color: #334155;
+    border-radius: 10px;
+}
+
+/* Individual Logged Match Card */
+.match-history-card {
+    background-color: var(--card-bg);
+    border-left: 5px solid #475569;
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.match-history-card.card-win {
+    border-left-color: var(--accent-green);
+}
+
+.match-history-card.card-loss {
+    border-left-color: var(--danger);
+}
+
+.history-meta {
+    text-align: left;
+}
+
+.hist-date {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.hist-opp {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-top: 0.2rem;
+}
+
+.hist-type {
+    font-size: 0.7rem;
+    background-color: #334155;
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+    display: inline-block;
+    margin-top: 0.4rem;
+}
+
+.history-outcome {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+}
+
+.hist-outcome-text {
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.hist-score {
+    font-size: 1.25rem;
+    font-weight: bold;
+    font-family: monospace;
+}
+
+.no-history {
+    color: var(--text-muted);
+    text-align: center;
+    margin: auto 0;
+    font-size: 0.9rem;
+    padding: 2rem;
+}
+
+/* ========================================== */
+/*   4. CONFIGURATION SETUP SCREEN STYLING    */
 /* ========================================== */
 .setup-form {
     flex: 1;
@@ -243,7 +525,7 @@ body {
 }
 
 /* ========================================== */
-/*   3. SCOREBOARD STYLING & RESPONSIVE CORES */
+/*   5. SCOREBOARD STYLING & RESPONSIVE CORES */
 /* ========================================== */
 .scoreboard-header {
     display: flex;
@@ -251,46 +533,6 @@ body {
     align-items: center;
 }
 
-#match-status {
-    font-size: 1.5rem;
-    letter-spacing: 1px;
-    color: var(--accent-gold);
-    margin-bottom: 0.25rem;
-}
-
-.sets-display {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.set-label {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-}
-
-.set-scores {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 0.25rem;
-}
-
-.set-pill {
-    background: var(--card-bg);
-    border: 1px solid var(--text-muted);
-    padding: 0.2rem 0.8rem;
-    border-radius: 20px;
-    font-weight: bold;
-    font-size: 1.1rem;
-}
-
-.set-divider {
-    color: var(--text-muted);
-}
-
-/* The Court stretched vertically on computers */
 .court {
     display: flex;
     flex: 1; 
@@ -299,7 +541,6 @@ body {
     transition: flex-direction 0.3s ease;
 }
 
-/* Big tall cards on computers */
 .player-box {
     flex: 1;
     background-color: var(--card-bg);
@@ -319,7 +560,6 @@ body {
     transform: scale(0.98);
 }
 
-/* Giant desktop score numbers */
 .score {
     font-size: 6rem;
     font-weight: 800;
@@ -343,7 +583,6 @@ body {
         width: 100%;
     }
 
-    /* FORCES perfect square proportions based on horizontal width on mobile */
     .player-box {
         flex: none;
         width: calc(50vw - 1.25rem); 
@@ -352,7 +591,6 @@ body {
         padding: 0.5rem; 
     }
 
-    /* Scales down texts to avoid overflowing the squares */
     .score {
         font-size: clamp(2.5rem, 8vh, 4rem); 
         margin: 0.1rem 0;
@@ -376,14 +614,11 @@ body {
 /* ========================================== */
 /*   SHARED INTERFACE STYLES (Both Devices)   */
 /* ========================================== */
-
-/* Active Server Box Styling */
 .player-box.serving {
     border-color: var(--accent-green);
     box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
 }
 
-/* Interactive Server Badge */
 .server-badge {
     background-color: transparent;
     color: var(--text-muted);
@@ -410,7 +645,6 @@ body {
     font-weight: 800;
 }
 
-/* Input names */
 .player-name {
     background: transparent;
     border: none;
@@ -432,7 +666,7 @@ body {
     color: var(--text-muted);
 }
 
-/* Bottom Controls Section - Guaranteed Visible */
+/* Bottom Controls */
 .controls {
     display: flex;
     gap: 0.5rem;
@@ -471,7 +705,9 @@ body {
     color: var(--text-main);
 }
 
-/* Overlay modal */
+/* ========================================== */
+/*   6. DIALOG/MODALS & ACTIONS LAYOUTS       */
+/* ========================================== */
 .modal {
     display: none;
     position: fixed;
@@ -479,7 +715,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.8);
+    background-color: rgba(0,0,0,0.85);
     justify-content: center;
     align-items: center;
     z-index: 1000;
@@ -487,24 +723,39 @@ body {
 
 .modal-content {
     background-color: var(--card-bg);
-    padding: 2rem;
+    padding: 2.25rem;
     border-radius: 16px;
     text-align: center;
     width: 85%;
-    max-width: 400px;
+    max-width: 420px;
+    border: 1px solid #334155;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    animation: fadeIn 0.15s ease-out;
 }
 
 .modal-content h2 {
     color: var(--accent-gold);
     margin-bottom: 1rem;
+    font-size: 1.5rem;
 }
 
 .modal-content p {
-    margin-bottom: 1.5rem;
-    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    font-size: 1.15rem;
+    color: var(--text-main);
 }
 
-/* Utility Class for Swapping Sides */
+.modal-button-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.modal-button-layout .btn {
+    width: 100%;
+}
+
+/* Swapping Direction layout */
 .swapped {
     flex-direction: row-reverse;
 }
