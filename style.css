@@ -473,6 +473,7 @@ body {
     justify-content: center;
     gap: 1.25rem;
     width: 100%;
+    margin-bottom: 1.5rem; /* Gap to guarantee space on config pages */
 }
 
 .form-group {
@@ -536,7 +537,9 @@ body {
 }
 
 .setup-footer {
+    margin-top: 1.5rem; /* Forces space between form dropdowns and Start Button */
     padding-bottom: 1rem;
+    width: 100%;
 }
 
 .btn-large {
@@ -569,8 +572,7 @@ body {
     display: flex;
     width: 100%;
     height: 120px; 
-    /* MATCHES App Dark Background */
-    background-color: var(--bg-dark); 
+    background-color: var(--bg-dark); /* Matches app dark background */
     border: 3px solid #ffffff; 
     border-radius: 8px;
     position: relative;
@@ -625,8 +627,7 @@ body {
     border-bottom: 1px solid var(--court-line);
     transition: all 0.2s ease;
     padding: 0.25rem;
-    /* Inactive quadrants inherit dark page color */
-    background-color: transparent; 
+    background-color: transparent; /* Default: matches dark background */
 }
 
 .visual-quadrant:last-child {
@@ -733,29 +734,30 @@ body {
         font-size: 0.8rem;
     }
 
-    /* Restricts score height to prevent pushing buttons out */
+    /* FIXED: Prevent vertical overlap on mobile screens */
     .court {
-        flex: none;
-        height: 32vh; /* Locks scoring box area */
-        margin: auto 0;
+        flex: 0 1 auto; /* Allow shrinking, no absolute heights */
+        height: auto;   /* Revert fixed height values */
+        margin: 0.75rem 0;
         display: flex;
         justify-content: center;
         align-items: center;
         width: 100%;
+        gap: 0.75rem;
     }
 
-    /* FORCES perfect square proportions based on horizontal width */
+    /* FIXED: Forces proportional scaling of scoring buttons based on screen width */
     .player-box {
-        flex: none;
-        width: calc(50vw - 1rem); 
-        height: 100%;
-        aspect-ratio: 1 / 1; 
-        padding: 0.4rem; 
+        flex: 1;
+        width: auto; /* Let flexbox handle width naturally */
+        max-height: 24vh; /* Safe vertical maximum to prevent overlap */
+        aspect-ratio: 1.1 / 1; /* Slightly wider than tall for easy tapping */
+        padding: 0.5rem; 
     }
 
     /* Scales down score text to fit comfortably inside boxes */
     .score {
-        font-size: clamp(2.2rem, 7vh, 3.5rem); 
+        font-size: clamp(2.2rem, 6vh, 3.5rem); 
         margin: 0.1rem 0;
         line-height: 1;
     }
