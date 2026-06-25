@@ -117,7 +117,6 @@
                 <!-- Match Log List -->
                 <h3 class="list-heading">Match History</h3>
                 <div class="history-list" id="history-container">
-                    <!-- Dynamic entries added via JS -->
                     <div class="no-history">No matches refereed yet. Your history will save automatically here.</div>
                 </div>
             </main>
@@ -142,11 +141,11 @@
                     </div>
                 </div>
 
-                <!-- Name Inputs -->
+                <!-- Name Inputs (Dynamically altered for Team & Individual configurations) -->
                 <div class="form-group" id="names-container">
                     <label class="input-label">Player Names</label>
-                    <input type="text" id="setup-p1-name" class="setup-input" value="Player 1" placeholder="Enter Player 1 Name">
-                    <input type="text" id="setup-p2-name" class="setup-input" value="Player 2" placeholder="Enter Player 2 Name">
+                    <input type="text" id="setup-p1-name" class="setup-input" value="Player 1" placeholder="Enter Player 1 Name" oninput="updateSetupServerNames()">
+                    <input type="text" id="setup-p2-name" class="setup-input" value="Player 2" placeholder="Enter Player 2 Name" oninput="updateSetupServerNames()">
                 </div>
 
                 <!-- Number of Sets -->
@@ -159,12 +158,14 @@
                     </select>
                 </div>
 
-                <!-- Select Starting Server -->
+                <!-- Select Starting Server (Reflects individual player names) -->
                 <div class="form-group">
                     <label class="input-label">First Serving Player</label>
                     <select id="setup-server" class="setup-select">
                         <option value="1" id="server-opt-1">Player 1</option>
                         <option value="2" id="server-opt-2">Player 2</option>
+                        <option value="3" id="server-opt-3" class="hidden">Player 1B</option>
+                        <option value="4" id="server-opt-4" class="hidden">Player 2B</option>
                     </select>
                 </div>
             </main>
@@ -192,9 +193,46 @@
                 </div>
             </header>
 
+            <!-- COURT VISUAL REPRESENTATION -->
+            <div class="court-visual-wrapper">
+                <div class="court-visual-label">TAP COURTS TO SWAP POSITIONS MANUALLY</div>
+                <div class="court-visual" id="court-visual">
+                    <!-- Left Side (Team A Side) -->
+                    <div class="visual-side" id="visual-side-p1">
+                        <!-- Top Left Quadrant (Left Service Court) -->
+                        <div class="visual-quadrant" id="quad-p1-left" onclick="togglePlayerPosition(1, 'Left')">
+                            <div class="quad-label">Left Court (Odd)</div>
+                            <div class="quad-player" id="player-p1-left"></div>
+                        </div>
+                        <!-- Bottom Left Quadrant (Right Service Court) -->
+                        <div class="visual-quadrant" id="quad-p1-right" onclick="togglePlayerPosition(1, 'Right')">
+                            <div class="quad-label">Right Court (Even)</div>
+                            <div class="quad-player" id="player-p1-right"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Center Net Divider -->
+                    <div class="visual-net"></div>
+                    
+                    <!-- Right Side (Team B Side) -->
+                    <div class="visual-side" id="visual-side-p2">
+                        <!-- Top Right Quadrant (Right Service Court) -->
+                        <div class="visual-quadrant" id="quad-p2-right" onclick="togglePlayerPosition(2, 'Right')">
+                            <div class="quad-label">Right Court (Even)</div>
+                            <div class="quad-player" id="player-p2-right"></div>
+                        </div>
+                        <!-- Bottom Right Quadrant (Left Service Court) -->
+                        <div class="visual-quadrant" id="quad-p2-left" onclick="togglePlayerPosition(2, 'Left')">
+                            <div class="quad-label">Left Court (Odd)</div>
+                            <div class="quad-player" id="player-p2-left"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- MAIN COURT AREA: Scoring Boxes -->
             <main class="court" id="court-layout">
-                <!-- Player 1 Box (Left) -->
+                <!-- Player 1 / Team A Box (Left) -->
                 <div class="player-box" id="p1-box" onclick="scorePoint(1)">
                     <button class="server-badge" id="p1-badge" onclick="selectServer(1, event)">SERVE</button>
                     <input type="text" class="player-name" id="p1-name" value="Player 1" onclick="event.stopPropagation()">
@@ -202,7 +240,7 @@
                     <div class="service-court" id="p1-court">Court: Right</div>
                 </div>
 
-                <!-- Player 2 Box (Right) -->
+                <!-- Player 2 / Team B Box (Right) -->
                 <div class="player-box" id="p2-box" onclick="scorePoint(2)">
                     <button class="server-badge" id="p2-badge" onclick="selectServer(2, event)">SERVE</button>
                     <input type="text" class="player-name" id="p2-name" value="Player 2" onclick="event.stopPropagation()">
@@ -211,27 +249,22 @@
                 </div>
             </main>
 
-            <!-- CONTROL PANEL (Toggled programmatically post-game) -->
+            <!-- CONTROL PANEL -->
             <footer class="controls" id="scoreboard-controls">
-                <!-- Default Controls -->
                 <button id="ctrl-undo" class="btn btn-secondary" onclick="undo()">Undo</button>
                 <button id="ctrl-swap" class="btn btn-secondary" onclick="swapSides()">Swap Sides</button>
                 <button id="ctrl-reset" class="btn btn-danger" onclick="resetMatch()">Reset Match</button>
-                <!-- Post-Match Only Buttons -->
                 <button id="ctrl-new-match" class="btn btn-primary hidden" onclick="navigateTo('screen-config')">Start New Match</button>
             </footer>
         </div>
     </div>
 
-    <!-- Notification Modal (Used for Alerting construction & Set/Match endings) -->
+    <!-- Notification Modal -->
     <div id="modal" class="modal" onclick="dismissModalOutside(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h2 id="modal-title">Set Won!</h2>
             <p id="modal-message">Player 1 wins the set.</p>
-            
-            <div id="modal-actions" class="modal-button-layout">
-                <!-- Dynamic actions added via code -->
-            </div>
+            <div id="modal-actions" class="modal-button-layout"></div>
         </div>
     </div>
 

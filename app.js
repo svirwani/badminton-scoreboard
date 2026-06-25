@@ -6,15 +6,29 @@ let state = {
     p1Sets: 0,
     p2Sets: 0,
     currentSet: 1,
-    server: 1, // 1 or 2
+    serverSide: 1, // 1 for Team A, 2 for Team B
     isGameOver: false,
     isMatchOver: false,
 
     // Match setup options
-    matchType: 'singles',
-    p1Name: 'Player 1',
-    p2Name: 'Player 2',
-    targetSetsToWin: 2
+    matchType: 'singles', // 'singles' or 'doubles'
+    p1Name: 'Player 1',  // Team A / Singles Player 1
+    p2Name: 'Player 2',  // Team B / Singles Player 2
+    targetSetsToWin: 2,
+
+    // INDIVIDUAL PLAYER NAMES (Configured in Setup)
+    tA_p1: 'Player 1A',
+    tA_p2: 'Player 1B',
+    tB_p1: 'Player 2A',
+    tB_p2: 'Player 2B',
+
+    // ACTIVE COURT LOCATIONS (Who is standing where)
+    tA_Left: 'Player 1A',
+    tA_Right: 'Player 1B',
+    tB_Left: 'Player 2A',
+    tB_Right: 'Player 2B',
+
+    activeServerName: 'Player 1A' // The specific player serving
 };
 
 // Undo stack to save previous states
@@ -59,75 +73,61 @@ let userProfile = {
     matchesPlayed: 0,
     matchesWon: 0,
     matchesLost: 0,
-    matchHistory: [] // Items structured: { id, opponent, scoreStr, dateString, type, result: 'Win'|'Loss' }
+    matchHistory: []
 };
 
 // ==========================================
 //   1. SIGNUP & ONBOARDING ENGINES
 // ==========================================
-
-// Load user session from LocalStorage
 function loadProfileData() {
     const saved = localStorage.getItem('champ_user_profile');
     if (saved) {
         userProfile = JSON.parse(saved);
         profileNameDisp.innerText = userProfile.name;
-        // Skip login if session verified
         navigateTo('screen-home');
     } else {
         navigateTo('screen-auth');
     }
 }
 
-// Write Profile details to LocalStorage
 function saveProfileToDisk() {
     localStorage.setItem('champ_user_profile', JSON.stringify(userProfile));
     profileNameDisp.innerText = userProfile.name;
 }
 
-// Social Signups (Mocks instant success)
 function handleSocialSignup(provider) {
     userProfile.name = `${provider} User`;
     saveProfileToDisk();
     navigateTo('screen-home');
 }
 
-// Send simulated OTP
 function sendOTP() {
     const field = authIdentifierInput.value.trim();
     if (!field) {
         alert("Please enter your Email or Mobile Number.");
         return;
     }
-    // Simulation triggers verification input visibility
     btnOtp.classList.add('hidden');
     otpInputGroup.classList.remove('hidden');
     alert("Simulated OTP generated! Enter code 1234 to verify.");
 }
 
-// Verify simulated OTP
 function verifyOTP() {
     const code = otpCodeInput.value;
     if (code !== '1234') {
         alert("Incorrect OTP code. Try entering 1234.");
         return;
     }
-    
-    // Create name based on contact information
     const identifier = authIdentifierInput.value.trim();
-    userProfile.name = identifier.split('@')[0]; // Username extraction
+    userProfile.name = identifier.split('@')[0];
     saveProfileToDisk();
-    
-    // Progress
     navigateTo('screen-home');
 }
 
 // ==========================================
 //   2. STATISTICS & MATCH LOG TRACKER
 // ==========================================
-
 function viewProfile() {
-    // Populate stats fields
     document.getElementById('stat-played').innerText = userProfile.matchesPlayed;
     document.getElementById('stat-won').innerText = userProfile.matchesWon;
     document.getElementById('stat-lost').innerText = userProfile.matchesLost;
@@ -137,14 +137,12 @@ function viewProfile() {
         : Math.round((userProfile.matchesWon / userProfile.matchesPlayed) * 100);
     document.getElementById('stat-rate').innerText = `${rate}%`;
 
-    // Render historical lists
     const container = document.getElementById('history-container');
-    container.innerHTML = ""; // Clear loader
+    container.innerHTML = "";
 
     if (userProfile.matchHistory.length === 0) {
         container.innerHTML = `<div class="no-history">No matches refereed yet. Your history will save automatically here.</div>`;
     } else {
-        // Render logs backward (most recent first)
         userProfile.matchHistory.slice().reverse().forEach(match => {
             const resultClass = match.result === 'Win' ? 'card-win' : 'card-loss';
             const textResultClass = match.result === 'Win' ? 'text-win' : 'text-loss';
@@ -168,14 +166,12 @@ function viewProfile() {
     navigateTo('screen-profile');
 }
 
-// Persists historical stats
 function commitMatchToHistory(winnerNum) {
     const oppName = winnerNum === 1 ? state.p2Name : state.p1Name;
     const finalScore = `${state.p1Score}-${state.p2Score}`;
-    const resultStatus = winnerNum === 1 ? 'Win' : 'Loss'; // User (Player 1) won or lost
+    const resultStatus = winnerNum === 1 ? 'Win' : 'Loss';
 
     const now = new Date();
-    // Pre-formatting current localized time/date strings securely
     const dateString = now.toLocaleDateString() + ' @ ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     const matchRecord = {
@@ -187,7 +183,6 @@ function commitMatchToHistory(winnerNum) {
         result: resultStatus
     };
 
-    // Update global variables
     userProfile.matchesPlayed++;
     if (resultStatus === 'Win') {
         userProfile.matchesWon++;
@@ -195,11 +190,8 @@ function commitMatchToHistory(winnerNum) {
         userProfile.matchesLost++;
     }
     userProfile.matchHistory.push(matchRecord);
-
-    // Save locally
     saveProfileToDisk();
 }
-
 
 // ==========================================
 //   3. NAVIGATION ENGINE
@@ -227,7 +219,6 @@ function confirmExit() {
     }
 }
 
-
 // ==========================================
 //   4. BADMINTON CONFIGURATION
 // ==========================================
@@ -237,9 +228,15 @@ function setMatchType(type) {
     const dBtn = document.getElementById('type-doubles');
     const namesContainer = document.getElementById('names-container');
 
+    const opt3 = document.getElementById('server-opt-3');
+    const opt4 = document.getElementById('server-opt-4');
+
     if (type === 'singles') {
         sBtn.classList.add('active');
         dBtn.classList.remove('active');
+        opt3.classList.add('hidden');
+        opt4.classList.add('hidden');
+        
         namesContainer.innerHTML = `
             <label class="input-label">Player Names</label>
             <input type="text" id="setup-p1-name" class="setup-input" value="${userProfile.name}" placeholder="Enter Player 1 Name" oninput="updateSetupServerNames()">
@@ -248,30 +245,49 @@ function setMatchType(type) {
     } else {
         sBtn.classList.remove('active');
         dBtn.classList.add('active');
+        opt3.classList.remove('hidden');
+        opt4.classList.remove('hidden');
+        
         namesContainer.innerHTML = `
-            <label class="input-label">Team Names</label>
-            <input type="text" id="setup-p1-name" class="setup-input" value="Team A" placeholder="Enter Team A Name" oninput="updateSetupServerNames()">
-            <input type="text" id="setup-p2-name" class="setup-input" value="Team B" placeholder="Enter Team B Name" oninput="updateSetupServerNames()">
+            <label class="input-label">Team A Configuration</label>
+            <input type="text" id="setup-p1-name" class="setup-input" value="Team A" placeholder="Team A Name" oninput="updateSetupServerNames()">
+            <input type="text" id="setup-tA-p1" class="setup-input" value="Player 1A" placeholder="Team A Player 1 Name" oninput="updateSetupServerNames()">
+            <input type="text" id="setup-tA-p2" class="setup-input" value="Player 1B" placeholder="Team A Player 2 Name" oninput="updateSetupServerNames()">
+            
+            <label class="input-label" style="margin-top: 1rem;">Team B Configuration</label>
+            <input type="text" id="setup-p2-name" class="setup-input" value="Team B" placeholder="Team B Name" oninput="updateSetupServerNames()">
+            <input type="text" id="setup-tB-p1" class="setup-input" value="Player 2A" placeholder="Team B Player 1 Name" oninput="updateSetupServerNames()">
+            <input type="text" id="setup-tB-p2" class="setup-input" value="Player 2B" placeholder="Team B Player 2 Name" oninput="updateSetupServerNames()">
         `;
     }
     updateSetupServerNames();
 }
 
 function updateSetupServerNames() {
-    const p1Val = document.getElementById('setup-p1-name').value || 'Player 1';
-    const p2Val = document.getElementById('setup-p2-name').value || 'Player 2';
-    
-    document.getElementById('server-opt-1').innerText = p1Val;
-    document.getElementById('server-opt-2').innerText = p2Val;
+    if (state.matchType === 'singles') {
+        const p1Val = document.getElementById('setup-p1-name').value || 'Player 1';
+        const p2Val = document.getElementById('setup-p2-name').value || 'Player 2';
+        document.getElementById('server-opt-1').innerText = p1Val;
+        document.getElementById('server-opt-2').innerText = p2Val;
+    } else {
+        const p1a = document.getElementById('setup-tA-p1').value || 'Player 1A';
+        const p1b = document.getElementById('setup-tA-p2').value || 'Player 1B';
+        const p2a = document.getElementById('setup-tB-p1').value || 'Player 2A';
+        const p2b = document.getElementById('setup-tB-p2').value || 'Player 2B';
+
+        document.getElementById('server-opt-1').innerText = `${p1a} (Team A)`;
+        document.getElementById('server-opt-2').innerText = `${p2a} (Team B)`;
+        document.getElementById('server-opt-3').innerText = `${p1b} (Team A)`;
+        document.getElementById('server-opt-4').innerText = `${p2b} (Team B)`;
+    }
 }
 
 function startMatch() {
     state.p1Name = document.getElementById('setup-p1-name').value || 'Player 1';
     state.p2Name = document.getElementById('setup-p2-name').value || 'Player 2';
     state.targetSetsToWin = parseInt(document.getElementById('setup-sets').value);
-    state.server = parseInt(document.getElementById('setup-server').value);
     
-    // Clear State variables
+    // Clear Match variables
     state.p1Score = 0;
     state.p2Score = 0;
     state.p1Sets = 0;
@@ -281,10 +297,59 @@ function startMatch() {
     state.isMatchOver = false;
     historyStack = [];
 
+    // Map player details based on Singles/Doubles configurations
+    if (state.matchType === 'singles') {
+        state.tA_p1 = state.p1Name;
+        state.tA_p2 = "";
+        state.tB_p1 = state.p2Name;
+        state.tB_p2 = "";
+
+        // Default initial courts (Singles starts Right on 0-0)
+        state.tA_Right = state.tA_p1;
+        state.tA_Left = "";
+        state.tB_Right = state.tB_p1;
+        state.tB_Left = "";
+
+        // Assign starting server side
+        const selectedServerVal = parseInt(document.getElementById('setup-server').value);
+        state.serverSide = (selectedServerVal === 1) ? 1 : 2;
+        state.activeServerName = (state.serverSide === 1) ? state.tA_p1 : state.tB_p1;
+    } else {
+        state.tA_p1 = document.getElementById('setup-tA-p1').value || 'Player 1A';
+        state.tA_p2 = document.getElementById('setup-tA-p2').value || 'Player 1B';
+        state.tB_p1 = document.getElementById('setup-tB-p1').value || 'Player 2A';
+        state.tB_p2 = document.getElementById('setup-tB-p2').value || 'Player 2B';
+
+        // Starting Positions
+        state.tA_Right = state.tA_p1;
+        state.tA_Left = state.tA_p2;
+        state.tB_Right = state.tB_p1;
+        state.tB_Left = state.tB_p2;
+
+        const serverOptIndex = parseInt(document.getElementById('setup-server').value);
+        if (serverOptIndex === 1) { // Team A P1
+            state.serverSide = 1;
+            state.activeServerName = state.tA_p1;
+        } else if (serverOptIndex === 3) { // Team A P2
+            state.serverSide = 1;
+            state.activeServerName = state.tA_p2;
+            // Swap setup positions so designated server starts on the Right (Even) court on 0-0
+            state.tA_Right = state.tA_p2;
+            state.tA_Left = state.tA_p1;
+        } else if (serverOptIndex === 2) { // Team B P1
+            state.serverSide = 2;
+            state.activeServerName = state.tB_p1;
+        } else { // Team B P2
+            state.serverSide = 2;
+            state.activeServerName = state.tB_p2;
+            state.tB_Right = state.tB_p2;
+            state.tB_Left = state.tB_p1;
+        }
+    }
+
     p1NameEl.value = state.p1Name;
     p2NameEl.value = state.p2Name;
 
-    // Reset scoreboards controls display views
     ctrlSwap.classList.remove('hidden');
     ctrlReset.classList.remove('hidden');
     ctrlNewMatch.classList.add('hidden');
@@ -292,7 +357,6 @@ function startMatch() {
     updateUI();
     navigateTo('screen-scoreboard');
 }
-
 
 // ==========================================
 //   5. SCOREBOARD RULES & SCORING MECHANICS
@@ -306,15 +370,96 @@ function scorePoint(player) {
 
     saveState();
 
+    const isCurrentServerScoring = (state.serverSide === player);
+
     if (player === 1) {
         state.p1Score++;
-        state.server = 1;
     } else {
         state.p2Score++;
-        state.server = 2;
+    }
+
+    // OFFICIAL BADMINTON ROTATION LOGIC
+    if (state.matchType === 'singles') {
+        state.serverSide = player;
+        state.activeServerName = (player === 1) ? state.tA_p1 : state.tB_p1;
+        
+        // Move players to correct side according to score
+        state.tA_Right = (state.p1Score % 2 === 0) ? state.tA_p1 : "";
+        state.tA_Left = (state.p1Score % 2 === 0) ? "" : state.tA_p1;
+        state.tB_Right = (state.p2Score % 2 === 0) ? state.tB_p1 : "";
+        state.tB_Left = (state.p2Score % 2 === 0) ? "" : state.tB_p1;
+    } else {
+        // Doubles Rule Engine
+        if (isCurrentServerScoring) {
+            // Serving team scored -> Partner swaps positions on court side
+            if (player === 1) {
+                const temp = state.tA_Right;
+                state.tA_Right = state.tA_Left;
+                state.tA_Left = temp;
+                
+                // Same player serves again from the alternate court
+                state.activeServerName = (state.p1Score % 2 === 0) ? state.tA_Right : state.tA_Left;
+            } else {
+                const temp = state.tB_Right;
+                state.tB_Right = state.tB_Left;
+                state.tB_Left = temp;
+                
+                state.activeServerName = (state.p2Score % 2 === 0) ? state.tB_Right : state.tB_Left;
+            }
+        } else {
+            // Receiving team scored -> Shift serving side. NO POSITION SWAPS.
+            state.serverSide = player;
+            if (player === 1) {
+                state.activeServerName = (state.p1Score % 2 === 0) ? state.tA_Right : state.tA_Left;
+            } else {
+                state.activeServerName = (state.p2Score % 2 === 0) ? state.tB_Right : state.tB_Left;
+            }
+        }
     }
 
     checkSetWinner();
+    updateUI();
+}
+
+// Manual Swap / Position Select (Clicked directly on tactical quadrant)
+function togglePlayerPosition(teamNum, courtStr) {
+    if (state.isGameOver || state.isMatchOver) return;
+
+    saveState();
+
+    if (state.matchType === 'singles') {
+        // Singles: Moving player swaps their court and switches serve if applicable
+        if (teamNum === 1) {
+            state.tA_Right = (courtStr === 'Right') ? state.tA_p1 : "";
+            state.tA_Left = (courtStr === 'Left') ? state.tA_p1 : "";
+            if (state.serverSide === 1) {
+                state.serverSide = 1;
+            }
+        } else {
+            state.tB_Right = (courtStr === 'Right') ? state.tB_p1 : "";
+            state.tB_Left = (courtStr === 'Left') ? state.tB_p1 : "";
+        }
+    } else {
+        // Doubles Court Taps
+        if (teamNum === 1) {
+            // If active serving side: Tapping partners swaps positions (changes active server)
+            const temp = state.tA_Right;
+            state.tA_Right = state.tA_Left;
+            state.tA_Left = temp;
+
+            if (state.serverSide === 1) {
+                state.activeServerName = (state.p1Score % 2 === 0) ? state.tA_Right : state.tA_Left;
+            }
+        } else {
+            const temp = state.tB_Right;
+            state.tB_Right = state.tB_Left;
+            state.tB_Left = temp;
+
+            if (state.serverSide === 2) {
+                state.activeServerName = (state.p2Score % 2 === 0) ? state.tB_Right : state.tB_Left;
+            }
+        }
+    }
     updateUI();
 }
 
@@ -342,18 +487,13 @@ function handleSetEnd(winnerNum) {
 
     if (state.p1Sets === state.targetSetsToWin || state.p2Sets === state.targetSetsToWin) {
         state.isMatchOver = true;
-        // Save the completed match to Referee profile history
         commitMatchToHistory(winnerNum);
-        
-        // Show Match Modal
-        showEndModal(`Match Won! 🏆`, `${winnerName} won the match by ${scoreStr}.`, true);
+        showEndModal(`Match Finished! 🏆`, `${winnerName} won the match by ${scoreStr}.`, true);
     } else {
-        // Show Game/Set Modal
-        showEndModal(`Set Won!`, `${winnerName} won the set by ${scoreStr}.`, false);
+        showEndModal(`Set Finished!`, `${winnerName} won the set by ${scoreStr}.`, false);
     }
 }
 
-// Custom Modal Engine: handles options and click handlers
 function showEndModal(title, msg, isMatchOver) {
     modalTitle.innerText = title;
     modalMessage.innerText = msg;
@@ -375,12 +515,10 @@ function showEndModal(title, msg, isMatchOver) {
     modal.style.display = "flex";
 }
 
-// Handle clicking outside the modal boundary wrapper
 function dismissModalOutside(event) {
     if (event.target === modal) {
         modal.style.display = "none";
         
-        // Match over: Freeze board and show special buttons
         if (state.isMatchOver) {
             ctrlSwap.classList.add('hidden');
             ctrlReset.classList.add('hidden');
@@ -389,7 +527,6 @@ function dismissModalOutside(event) {
     }
 }
 
-// Undo direct from within set/match winning dialog
 function undoMatchEnd() {
     modal.style.display = "none";
     undo();
@@ -402,24 +539,49 @@ function closeModal() {
         state.p2Score = 0;
         state.currentSet++;
         state.isGameOver = false;
+        
+        // Reset positions for next set
+        if (state.matchType === 'singles') {
+            state.tA_Right = state.tA_p1;
+            state.tA_Left = "";
+            state.tB_Right = state.tB_p1;
+            state.tB_Left = "";
+        } else {
+            state.tA_Right = state.tA_p1;
+            state.tA_Left = state.tA_p2;
+            state.tB_Right = state.tB_p1;
+            state.tB_Left = state.tB_p2;
+        }
+
         updateUI();
     }
 }
 
-function selectServer(player, event) {
+// Shift serve manually via the score panels
+function selectServer(teamNum, event) {
     if (event) event.stopPropagation();
 
-    if (state.server === player || state.isGameOver || state.isMatchOver) return;
+    if (state.isGameOver || state.isMatchOver) return;
 
     saveState();
-    state.server = player;
+    state.serverSide = teamNum;
+
+    // Map active server to correct player based on Even/Odd score court
+    if (state.matchType === 'singles') {
+        state.activeServerName = (teamNum === 1) ? state.tA_p1 : state.tB_p1;
+    } else {
+        if (teamNum === 1) {
+            state.activeServerName = (state.p1Score % 2 === 0) ? state.tA_Right : state.tA_Left;
+        } else {
+            state.activeServerName = (state.p2Score % 2 === 0) ? state.tB_Right : state.tB_Left;
+        }
+    }
     updateUI();
 }
 
 function undo() {
     if (historyStack.length === 0) return;
     
-    // If we undo a completed match, remove the last entry from profile history
     if (state.isMatchOver) {
         const removed = userProfile.matchHistory.pop();
         userProfile.matchesPlayed--;
@@ -435,7 +597,6 @@ function undo() {
     p1NameEl.value = state.p1Name;
     p2NameEl.value = state.p2Name;
 
-    // Reset controls layout views
     ctrlSwap.classList.remove('hidden');
     ctrlReset.classList.remove('hidden');
     ctrlNewMatch.classList.add('hidden');
@@ -445,6 +606,7 @@ function undo() {
 
 function swapSides() {
     courtLayout.classList.toggle('swapped');
+    document.getElementById('court-visual').classList.toggle('swapped');
 }
 
 function resetMatch() {
@@ -456,18 +618,34 @@ function resetMatch() {
         state.currentSet = 1;
         state.isGameOver = false;
         state.isMatchOver = false;
+        
+        if (state.matchType === 'singles') {
+            state.tA_Right = state.tA_p1;
+            state.tA_Left = "";
+            state.tB_Right = state.tB_p1;
+            state.tB_Left = "";
+        } else {
+            state.tA_Right = state.tA_p1;
+            state.tA_Left = state.tA_p2;
+            state.tB_Right = state.tB_p1;
+            state.tB_Left = state.tB_p2;
+        }
+
         historyStack = [];
         updateUI();
     }
 }
 
+// UI RENDERING ENGINE
 function updateUI() {
+    // 1. Text Scores
     p1ScoreEl.innerText = state.p1Score;
     p2ScoreEl.innerText = state.p2Score;
     p1SetsEl.innerText = state.p1Sets;
     p2SetsEl.innerText = state.p2Sets;
 
-    if (state.server === 1) {
+    // 2. Active Server Box Styles
+    if (state.serverSide === 1) {
         p1Box.classList.add('serving');
         p2Box.classList.remove('serving');
     } else {
@@ -475,16 +653,51 @@ function updateUI() {
         p1Box.classList.remove('serving');
     }
 
-    const p1Court = (state.p1Score % 2 === 0) ? "Right" : "Left";
-    const p2Court = (state.p2Score % 2 === 0) ? "Right" : "Left";
+    // 3. Text Court Labels
+    const p1ActiveCourt = (state.matchType === 'singles')
+        ? (state.p1Score % 2 === 0 ? 'Right' : 'Left')
+        : (state.activeServerName === state.tA_Right ? 'Right' : 'Left');
+        
+    const p2ActiveCourt = (state.matchType === 'singles')
+        ? (state.p2Score % 2 === 0 ? 'Right' : 'Left')
+        : (state.activeServerName === state.tB_Right ? 'Right' : 'Left');
 
-    p1CourtEl.innerText = `Court: ${p1Court}`;
-    p2CourtEl.innerText = `Court: ${p2Court}`;
-
+    p1CourtEl.innerText = (state.serverSide === 1) ? `Server: ${state.activeServerName} (${p1ActiveCourt})` : `Receiver: ${state.matchType === 'singles' ? state.tA_p1 : (p2ActiveCourt === 'Right' ? state.tA_Right : state.tA_Left)}`;
+    p2CourtEl.innerText = (state.serverSide === 2) ? `Server: ${state.activeServerName} (${p2ActiveCourt})` : `Receiver: ${state.matchType === 'singles' ? state.tB_p1 : (p1ActiveCourt === 'Right' ? state.tB_Right : state.tB_Left)}`;
+    
     matchStatusEl.innerText = `SET ${state.currentSet}`;
+
+    // 4. COURT VISUAL ELEMENTS RENDERING
+    // Reset all quadrants
+    document.querySelectorAll('.visual-quadrant').forEach(q => {
+        q.classList.remove('serving-quad');
+    });
+    document.getElementById('player-p1-left').innerText = "";
+    document.getElementById('player-p1-right').innerText = "";
+    document.getElementById('player-p2-left').innerText = "";
+    document.getElementById('player-p2-right').innerText = "";
+
+    // Render Players to positions
+    document.getElementById('player-p1-left').innerText = state.tA_Left;
+    document.getElementById('player-p1-right').innerText = state.tA_Right;
+    document.getElementById('player-p2-left').innerText = state.tB_Left;
+    document.getElementById('player-p2-right').innerText = state.tB_Right;
+
+    // HIGHLIGHT ONLY THE ACTIVE SERVER
+    if (state.serverSide === 1) {
+        if (state.activeServerName === state.tA_Right) {
+            document.getElementById('quad-p1-right').classList.add('serving-quad');
+        } else {
+            document.getElementById('quad-p1-left').classList.add('serving-quad');
+        }
+    } else {
+        if (state.activeServerName === state.tB_Right) {
+            document.getElementById('quad-p2-right').classList.add('serving-quad');
+        } else {
+            document.getElementById('quad-p2-left').classList.add('serving-quad');
+        }
+    }
 }
 
-// ==========================================
-//   INIT ENGINE ON RUNTIME
-// ==========================================
+// Initial Run
 loadProfileData();
