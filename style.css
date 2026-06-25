@@ -473,7 +473,6 @@ body {
     justify-content: center;
     gap: 1.25rem;
     width: 100%;
-    margin-bottom: 1.5rem; /* Gap to guarantee space on config pages */
 }
 
 .form-group {
@@ -536,10 +535,12 @@ body {
     margin-bottom: 0.5rem;
 }
 
+/* FIXED: Guaranteed visible un-collapsible gap on Singles & Doubles screens */
 .setup-footer {
-    margin-top: 1.5rem; /* Forces space between form dropdowns and Start Button */
-    padding-bottom: 1rem;
+    margin-top: 2rem !important; /* Forces solid 32px gap below dropdowns */
+    padding-bottom: 1.5rem;
     width: 100%;
+    flex: 0 0 auto;
 }
 
 .btn-large {
@@ -627,7 +628,7 @@ body {
     border-bottom: 1px solid var(--court-line);
     transition: all 0.2s ease;
     padding: 0.25rem;
-    background-color: transparent; /* Default: matches dark background */
+    background-color: transparent; 
 }
 
 .visual-quadrant:last-child {
@@ -668,7 +669,7 @@ body {
 }
 
 /* ========================================== */
-/*   6. SCOREBOARD STYLING & MOBILE CORES     */
+/*   6. SCOREBOARD STYLING & DESKTOP CORES    */
 /* ========================================== */
 .scoreboard-header {
     display: flex;
@@ -714,16 +715,85 @@ body {
 }
 
 /* ========================================== */
-/*   MOBILE-ONLY STYLING OVERRIDES (Max-768px)*/
+/*   MOBILE-ONLY PROPORTIONAL SCREEN LOCK     */
 /* ========================================== */
 @media (max-width: 768px) {
-    .app-container {
-        padding: 0.5rem; 
+    /* 1. Locks the scoreboard screen to viewport, stopping scroll overlaps completely */
+    #screen-scoreboard {
+        overflow: hidden !important; 
+        height: 100vh;
+        height: 100dvh;
     }
 
-    /* Scales down Court visualization height on phones */
-    .court-visual {
-        height: 80px; 
+    #screen-scoreboard .app-container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* Strictly maps child components */
+        padding: 0.75rem 0.5rem;
+        box-sizing: border-box;
+    }
+
+    /* 2. Header receives exactly 12% vertical space */
+    #screen-scoreboard .scoreboard-header {
+        flex: 0 0 12%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin: 0;
+    }
+
+    /* 3. Court Visual Wrapper receives exactly 20% vertical space */
+    #screen-scoreboard .court-visual-wrapper {
+        flex: 0 0 20%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin: 0;
+    }
+
+    #screen-scoreboard .court-visual {
+        height: 100%; /* Fully fills wrapper boundaries */
+        max-height: 80px; /* Stop layout bloat */
+    }
+
+    /* 4. Scoring Boxes receive exactly 48% vertical space */
+    #screen-scoreboard .court {
+        flex: 0 0 48%;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0;
+        height: auto;
+    }
+
+    /* 5. Player Boxes fill the 48% container exactly, completely removing aspect-ratio conflicts */
+    #screen-scoreboard .player-box {
+        height: 100%;
+        flex: 1;
+        width: auto;
+        aspect-ratio: auto !important; /* Removes width-to-height expansion bugs */
+        padding: 0.4rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-sizing: border-box;
+    }
+
+    /* 6. Dynamic font-size bound strictly to vertical height (vh) rather than screen width */
+    #screen-scoreboard .score {
+        font-size: clamp(2rem, 9.5vh, 3.3rem) !important; 
+        line-height: 1;
+        margin: auto 0;
+    }
+
+    /* 7. Bottom controls receive exactly 12% vertical space */
+    #screen-scoreboard .controls {
+        flex: 0 0 12%;
+        display: flex;
+        align-items: center;
+        margin: 0;
+        padding-bottom: env(safe-area-inset-bottom, 0);
     }
 
     .quad-label {
@@ -732,34 +802,6 @@ body {
 
     .quad-player {
         font-size: 0.8rem;
-    }
-
-    /* FIXED: Prevent vertical overlap on mobile screens */
-    .court {
-        flex: 0 1 auto; /* Allow shrinking, no absolute heights */
-        height: auto;   /* Revert fixed height values */
-        margin: 0.75rem 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        gap: 0.75rem;
-    }
-
-    /* FIXED: Forces proportional scaling of scoring buttons based on screen width */
-    .player-box {
-        flex: 1;
-        width: auto; /* Let flexbox handle width naturally */
-        max-height: 24vh; /* Safe vertical maximum to prevent overlap */
-        aspect-ratio: 1.1 / 1; /* Slightly wider than tall for easy tapping */
-        padding: 0.5rem; 
-    }
-
-    /* Scales down score text to fit comfortably inside boxes */
-    .score {
-        font-size: clamp(2.2rem, 6vh, 3.5rem); 
-        margin: 0.1rem 0;
-        line-height: 1;
     }
 
     .player-name {
